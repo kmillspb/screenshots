@@ -6,6 +6,12 @@ const puppeteer = require('puppeteer');
 let argv = require('minimist')(process.argv.slice(2));
 //console.dir(argv);
 
+const directory = "screenshots/";
+
+let filenameHelper = (sitename, devicename, custom) => {
+    return directory + sitename + '__' + devicename + '__' + custom + '.png'
+};
+
 if (typeof argv.branch !== "string") {
     console.error('please provide branch (e.g. --branch="BO-123")');
     process.exit(1);
@@ -155,11 +161,11 @@ const sites = [
             },
             {
                 type: "clp",
-                path: "bras.html" //todo tights.html
+                path: "tights.html" //todo tights.html
             },
             {
                 type: "pdp",
-                path: "touch-sheers-h3049o-nuq.html", //todo update once live
+                path: "touch-sheers-15-denier-h3049o-nus.html", //todo update once live
             },
         ]
     },
@@ -327,7 +333,7 @@ const testDevices = [
                         console.error(error);
                     });
 
-                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + path + '.png'})
+                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, path)})
                         .then(() => console.log('Quickcheckout ' + ' [' + testDevice.name + ' screenshot taken: ' + site.siteName)).catch((error) => {
                             console.error('ERROR 5');
                             console.error(error);
@@ -363,7 +369,7 @@ const testDevices = [
                         console.error(error);
                     });
 
-                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + filename + '.png'})
+                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, filename)})
                         .then(() => console.log('site:' + site.siteName + ', path:' + path + ', device:' + testDevice.name + ', filename:' + filename + ' - screenshot taken')).catch((error) => {
                             console.error('ERROR 10');
                             console.error(error);
@@ -438,7 +444,7 @@ const testDevices = [
                                     console.error(error);
                                 });
 
-                                await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + pp.type + '_addToCart.png'})
+                                await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, pp.type + '_addToCart')})
                                     .then(() => console.log(pp.type + ' screenshot taken: ' + site.siteName)).catch((error) => {
                                         console.error('ERROR 17');
                                         console.error(error);
@@ -465,7 +471,7 @@ const testDevices = [
                                         console.error(error);
                                     });
 
-                                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + 'quickcheckout_populated' + '.png'})
+                                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, 'quickcheckout_populated')})
                                         .then(() => console.log('Quickcheckout screenshot taken: ' + site.siteName)).catch((error) => {
                                             console.error('ERROR 21');
                                             console.error(error);
@@ -489,7 +495,7 @@ const testDevices = [
                 } else {
                     //not pdp:
 
-                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + pp.type + '.png'}).then(() => console.log(site.siteName + '__' + testDevice.name + '__' + pp.type + '.png')).catch((error) => {
+                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, pp.type)}).then(() => console.log(site.siteName + '__' + testDevice.name + '__' + pp.type + '.png')).catch((error) => {
                         console.error('ERROR 12');
                         console.error(error);
                     });
