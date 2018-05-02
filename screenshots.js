@@ -6,7 +6,7 @@ const puppeteer = require('puppeteer');
 let argv = require('minimist')(process.argv.slice(2));
 //console.dir(argv);
 
-const directory = "screenshots/";
+const directory = "branch_screenshots/";
 
 let filenameHelper = (sitename, devicename, custom) => {
     return directory + sitename + '__' + devicename + '__' + custom + '.png'
