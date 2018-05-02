@@ -58,6 +58,10 @@ const sites = [
                 type: "pdp",
                 path: "hipster-bikini-w0149i-ntv.html", //choose a pdp with stock
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     }, {
         siteName: "berlei",
@@ -71,6 +75,10 @@ const sites = [
                 type: "pdp",
                 path: "barely-there-contour-bra-y250n-o32.html",
             },
+            {
+                type: "stockists",
+                path: "stockists",
+            }
         ]
     },
     {
@@ -85,6 +93,10 @@ const sites = [
                 type: "pdp",
                 path: "hipster-hot-shortie-wxbqa-26v.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -113,6 +125,10 @@ const sites = [
                 type: "pdp",
                 path: "cool-force-trunk-myfn1z-nrq.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -127,6 +143,10 @@ const sites = [
                 type: "pdp",
                 path: "floral-delustre-underwire-y1035h-011.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -149,6 +169,10 @@ const sites = [
                 type: "pdp",
                 path: "love-the-lift-custom-push-up-yxxr-prp.html",
             },
+            {
+                type: "stockists",
+                path: "stockists",
+            }
         ]
     },
     {
@@ -188,6 +212,10 @@ const sites = [
                 type: "pdp",
                 path: "abbotson-linen-tailored-quilt-cover-s28p-b110-c195-796-toile.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -205,6 +233,10 @@ const sites = [
                 type: "pdp",
                 path: "sheridan-everyday-linen-quilt-cover-set-o612-b110-c242-012-flax.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     /*
