@@ -154,5 +154,11 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+branch_screenshots/
+diffs/
+test_screenshots/
+prod_screenshots/
+dev_screenshots/
+*.zip
 
 # End of https://www.gitignore.io/api/osx,node,intellij

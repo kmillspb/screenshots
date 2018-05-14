@@ -1,3 +1,4 @@
+let siteHelpers = require('./helpers/site.js');
 //TODO squish em https://www.npmjs.com/package/kraken-api
 //TODO zip em https://www.npmjs.com/package/archiver
 
@@ -6,14 +7,68 @@ const puppeteer = require('puppeteer');
 let argv = require('minimist')(process.argv.slice(2));
 //console.dir(argv);
 
-if (typeof argv.branch !== "string") {
-    console.error('please provide branch (e.g. --branch="BO-123")');
-    process.exit(1);
+let directory = "branch_screenshots/";
+let directorySet = false;
+
+let filenameHelper = (sitename, devicename, custom) => {
+    return directory + sitename + '__' + devicename + '__' + custom + '.png'
+};
+
+let environment = siteHelpers.BRANCH_ENVIRONMENT;
+
+if (typeof argv.out === "string" && argv.out.length){
+    if (argv.env[argv.env - 1] == "/") {
+        directory = argv.env;
+    } else {
+        directory = argv.env + "/";
+    }
+    directorySet = true;
 }
 
-if (typeof argv.gituser !== "string") {
-    console.error('please provide git user name (e.g. tobyj');
-    process.exit(1);
+if (typeof argv.env === "string") {
+    switch(argv.env){
+        case siteHelpers.TEST_ENVIRONMENT:
+            environment = siteHelpers.TEST_ENVIRONMENT;
+            if (!directorySet){
+                directory = "test_screenshots/";
+            }
+            break;
+        case siteHelpers.BRANCH_ENVIRONMENT:
+            environment = siteHelpers.BRANCH_ENVIRONMENT;
+            if (!directorySet){
+                directory = "branch_screenshots/";
+            }
+            break;
+        case siteHelpers.DEV_ENVIRONMENT:
+            environment = siteHelpers.DEV_ENVIRONMENT;
+            if (!directorySet){
+                directory = "dev_screenshots/";
+            }
+            break;
+        case siteHelpers.PROD_ENVIRONMENT:
+            environment = siteHelpers.PROD_ENVIRONMENT;
+            if (!directorySet){
+                directory = "prod_screenshots/";
+            }
+            break;
+        default:
+            console.error('Please provide a valid environment (e.g. test, branch, dev, prod');
+            process.exit(1);        
+            break;
+    }
+}
+
+// Don't need branch and user on non-branch environments
+if (environment === siteHelpers.BRANCH_ENVIRONMENT){
+    if (typeof argv.branch !== "string") {
+        console.error('please provide branch (e.g. --branch="BO-123")');
+        process.exit(1);
+    }
+
+    if (typeof argv.gituser !== "string") {
+        console.error('please provide git user name (e.g. tobyj');
+        process.exit(1);
+    }
 }
 
 let sitesToRun = false; //will run all by default
@@ -31,11 +86,6 @@ if (typeof argv.sites === "string") {
     console.log('Running on all sites...\n');
 }
 
-const baseUrl = "https://pbauardev1.pacificbrands.local/test/";
-//const baseUrl = "https://"; //localdev
-//const baseUrl = "https://test."; //test
-//const baseUrl = "https://www."; //www
-
 const gitUser = argv.gituser;
 const branch = argv.branch;
 
@@ -52,6 +102,10 @@ const sites = [
                 type: "pdp",
                 path: "hipster-bikini-w0149i-ntv.html", //choose a pdp with stock
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     }, {
         siteName: "berlei",
@@ -65,6 +119,10 @@ const sites = [
                 type: "pdp",
                 path: "barely-there-contour-bra-y250n-o32.html",
             },
+            {
+                type: "stockists",
+                path: "stockists",
+            }
         ]
     },
     {
@@ -79,6 +137,10 @@ const sites = [
                 type: "pdp",
                 path: "hipster-hot-shortie-wxbqa-26v.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -107,6 +169,10 @@ const sites = [
                 type: "pdp",
                 path: "cool-force-trunk-myfn1z-nrq.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -121,6 +187,10 @@ const sites = [
                 type: "pdp",
                 path: "floral-delustre-underwire-y1035h-011.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -143,6 +213,10 @@ const sites = [
                 type: "pdp",
                 path: "love-the-lift-custom-push-up-yxxr-prp.html",
             },
+            {
+                type: "stockists",
+                path: "stockists",
+            }
         ]
     },
     {
@@ -155,11 +229,11 @@ const sites = [
             },
             {
                 type: "clp",
-                path: "bras.html" //todo tights.html
+                path: "tights.html" //todo tights.html
             },
             {
                 type: "pdp",
-                path: "touch-sheers-h3049o-nuq.html", //todo update once live
+                path: "touch-sheers-15-denier-h3049o-nus.html", //todo update once live
             },
         ]
     },
@@ -182,6 +256,10 @@ const sites = [
                 type: "pdp",
                 path: "abbotson-linen-tailored-quilt-cover-s28p-b110-c195-796-toile.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     {
@@ -199,6 +277,10 @@ const sites = [
                 type: "pdp",
                 path: "sheridan-everyday-linen-quilt-cover-set-o612-b110-c242-012-flax.html",
             },
+            {
+                type: "stores",
+                path: "stores",
+            }
         ]
     },
     /*
@@ -272,12 +354,13 @@ const testDevices = [
 
         page.setDefaultNavigationTimeout(45000);//bloody sheridan
 
-        //pbauardev1:
-        let branchUrlToTest = baseUrl + gitUser + '/' + branch + '/' + site.siteName + '/';
-        //localDev
-        //let branchUrlToTest = baseUrl + site.siteName + '.local/';
-        //Production
-        //let branchUrlToTest = baseUrl + site.siteName + '.local/';
+        let branchUrlToTest = "";
+
+        if (environment === siteHelpers.BRANCH_ENVIRONMENT){
+            branchUrlToTest = siteHelpers.getBranchUrl(gitUser, branch, site.siteName);
+        } else {
+            branchUrlToTest = siteHelpers.getUrl(site.siteName, environment);
+        }
 
         console.log('Testing ' + branchUrlToTest);
 
@@ -327,7 +410,7 @@ const testDevices = [
                         console.error(error);
                     });
 
-                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + path + '.png'})
+                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, path)})
                         .then(() => console.log('Quickcheckout ' + ' [' + testDevice.name + ' screenshot taken: ' + site.siteName)).catch((error) => {
                             console.error('ERROR 5');
                             console.error(error);
@@ -363,7 +446,7 @@ const testDevices = [
                         console.error(error);
                     });
 
-                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + filename + '.png'})
+                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, filename)})
                         .then(() => console.log('site:' + site.siteName + ', path:' + path + ', device:' + testDevice.name + ', filename:' + filename + ' - screenshot taken')).catch((error) => {
                             console.error('ERROR 10');
                             console.error(error);
@@ -438,7 +521,7 @@ const testDevices = [
                                     console.error(error);
                                 });
 
-                                await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + pp.type + '_addToCart.png'})
+                                await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, pp.type + '_addToCart')})
                                     .then(() => console.log(pp.type + ' screenshot taken: ' + site.siteName)).catch((error) => {
                                         console.error('ERROR 17');
                                         console.error(error);
@@ -465,7 +548,7 @@ const testDevices = [
                                         console.error(error);
                                     });
 
-                                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + 'quickcheckout_populated' + '.png'})
+                                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, 'quickcheckout_populated')})
                                         .then(() => console.log('Quickcheckout screenshot taken: ' + site.siteName)).catch((error) => {
                                             console.error('ERROR 21');
                                             console.error(error);
@@ -489,7 +572,7 @@ const testDevices = [
                 } else {
                     //not pdp:
 
-                    await page.screenshot({path: site.siteName + '__' + testDevice.name + '__' + pp.type + '.png'}).then(() => console.log(site.siteName + '__' + testDevice.name + '__' + pp.type + '.png')).catch((error) => {
+                    await page.screenshot({path: filenameHelper(site.siteName, testDevice.name, pp.type)}).then(() => console.log(site.siteName + '__' + testDevice.name + '__' + pp.type + '.png')).catch((error) => {
                         console.error('ERROR 12');
                         console.error(error);
                     });
