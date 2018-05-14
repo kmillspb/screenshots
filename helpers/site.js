@@ -27,10 +27,10 @@ let getSiteUrl = (site, environment) => {
 	if (environment === TEST_ENVIRONMENT) {
 		return `https://test.${site}.com.au/`;
 	} else if (environment === PROD_ENVIRONMENT) {
-		return `https://${site}.com.au/`;
+		return `https://www.${site}.com.au/`;
 	}
 
-	return `https://www.${site}.local/`;
+	return `https://${site}.local/`;
 };
 
 module.exports = {
