@@ -1,4 +1,5 @@
 let siteHelpers = require('./helpers/site.js');
+var fs = require('fs');
 //TODO squish em https://www.npmjs.com/package/kraken-api
 //TODO zip em https://www.npmjs.com/package/archiver
 
@@ -18,9 +19,9 @@ let environment = siteHelpers.BRANCH_ENVIRONMENT;
 
 if (typeof argv.out === "string" && argv.out.length){
     if (argv.env[argv.env - 1] == "/") {
-        directory = argv.env;
+        directory = argv.out;
     } else {
-        directory = argv.env + "/";
+        directory = argv.out + "/";
     }
     directorySet = true;
 }
@@ -69,6 +70,10 @@ if (environment === siteHelpers.BRANCH_ENVIRONMENT){
         console.error('please provide git user name (e.g. tobyj');
         process.exit(1);
     }
+}
+
+if (!fs.existsSync(directory)){
+    fs.mkdirSync(directory);
 }
 
 let sitesToRun = false; //will run all by default
