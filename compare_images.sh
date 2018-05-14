@@ -1,11 +1,11 @@
 # compare_images.sh
 # Requires imagemagick `brew update && brew install imagemagick`
 
-for entry in "branch_screenshots"/*
+for entry in "$1"/*
 do
   if [ -f "$entry" ];then
-    NAME=`basename $entry`
+    NAME=`basename "$entry"`
     echo $NAME
-    `compare screenshots/$NAME branch_screenshots/$NAME -compose src diffs/$NAME.png`
+    `compare "$1/$NAME" "$2/$NAME" -compose src "diffs/$NAME"`
   fi
 done
