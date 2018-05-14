@@ -1,3 +1,4 @@
+let siteHelpers = require('./helpers/site.js');
 //TODO squish em https://www.npmjs.com/package/kraken-api
 //TODO zip em https://www.npmjs.com/package/archiver
 
@@ -6,20 +7,68 @@ const puppeteer = require('puppeteer');
 let argv = require('minimist')(process.argv.slice(2));
 //console.dir(argv);
 
-const directory = "branch_screenshots/";
+let directory = "branch_screenshots/";
+let directorySet = false;
 
 let filenameHelper = (sitename, devicename, custom) => {
     return directory + sitename + '__' + devicename + '__' + custom + '.png'
 };
 
-if (typeof argv.branch !== "string") {
-    console.error('please provide branch (e.g. --branch="BO-123")');
-    process.exit(1);
+let environment = siteHelpers.BRANCH_ENVIRONMENT;
+
+if (typeof argv.out === "string" && argv.out.length){
+    if (argv.env[argv.env - 1] == "/") {
+        directory = argv.env;
+    } else {
+        directory = argv.env + "/";
+    }
+    directorySet = true;
 }
 
-if (typeof argv.gituser !== "string") {
-    console.error('please provide git user name (e.g. tobyj');
-    process.exit(1);
+if (typeof argv.env === "string") {
+    switch(argv.env){
+        case siteHelpers.TEST_ENVIRONMENT:
+            environment = siteHelpers.TEST_ENVIRONMENT;
+            if (!directorySet){
+                directory = "test_screenshots/";
+            }
+            break;
+        case siteHelpers.BRANCH_ENVIRONMENT:
+            environment = siteHelpers.BRANCH_ENVIRONMENT;
+            if (!directorySet){
+                directory = "branch_screenshots/";
+            }
+            break;
+        case siteHelpers.DEV_ENVIRONMENT:
+            environment = siteHelpers.DEV_ENVIRONMENT;
+            if (!directorySet){
+                directory = "dev_screenshots/";
+            }
+            break;
+        case siteHelpers.PROD_ENVIRONMENT:
+            environment = siteHelpers.PROD_ENVIRONMENT;
+            if (!directorySet){
+                directory = "prod_screenshots/";
+            }
+            break;
+        default:
+            console.error('Please provide a valid environment (e.g. test, branch, dev, prod');
+            process.exit(1);        
+            break;
+    }
+}
+
+// Don't need branch and user on non-branch environments
+if (environment === siteHelpers.BRANCH_ENVIRONMENT){
+    if (typeof argv.branch !== "string") {
+        console.error('please provide branch (e.g. --branch="BO-123")');
+        process.exit(1);
+    }
+
+    if (typeof argv.gituser !== "string") {
+        console.error('please provide git user name (e.g. tobyj');
+        process.exit(1);
+    }
 }
 
 let sitesToRun = false; //will run all by default
@@ -36,11 +85,6 @@ if (typeof argv.sites === "string") {
 } else {
     console.log('Running on all sites...\n');
 }
-
-const baseUrl = "https://pbauardev1.pacificbrands.local/test/";
-//const baseUrl = "https://"; //localdev
-//const baseUrl = "https://test."; //test
-//const baseUrl = "https://www."; //www
 
 const gitUser = argv.gituser;
 const branch = argv.branch;
@@ -310,12 +354,13 @@ const testDevices = [
 
         page.setDefaultNavigationTimeout(45000);//bloody sheridan
 
-        //pbauardev1:
-        let branchUrlToTest = baseUrl + gitUser + '/' + branch + '/' + site.siteName + '/';
-        //localDev
-        //let branchUrlToTest = baseUrl + site.siteName + '.local/';
-        //Production
-        //let branchUrlToTest = baseUrl + site.siteName + '.local/';
+        let branchUrlToTest = "";
+
+        if (environment === siteHelpers.BRANCH_ENVIRONMENT){
+            branchUrlToTest = siteHelpers.getBranchUrl(gitUser, branch, site.siteName);
+        } else {
+            branchUrlToTest = siteHelpers.getUrl(site.siteName, environment);
+        }
 
         console.log('Testing ' + branchUrlToTest);
 
