@@ -6,7 +6,7 @@ const exceptionSites = {
 	},
 	'sheridanuk': {
 		'test': 'https://test.sheridanaustralia.co.uk',
-		'prod': 'https://www.totallytights.co.uk',
+		'prod': 'https://www.sheridanaustralia.co.uk',
 		'dev': 'https://sheridanuk.local'
 	},
 	'fairydown': {
